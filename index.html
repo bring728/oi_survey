@@ -17,10 +17,9 @@
         .image-item {
             text-align: center;
         }
-        /* 이미지 크기를 크게 설정 */
         .image-item img {
-            width: 400px; /* 이미지 너비를 400px로 설정 */
-            height: auto; /* 높이를 자동으로 설정하여 비율 유지 */
+            width: 400px; /* 이미지 크기 설정 */
+            height: auto; /* 비율 유지 */
         }
         #submitBtn {
             margin-top: 20px;
@@ -34,7 +33,7 @@
     <h1>Image Selection Survey</h1>
 
     <form id="surveyForm">
-        <!-- 20개의 질문을 자동 생성 -->
+        <!-- 질문이 생성될 영역 -->
         <div id="questions"></div>
 
         <br>
@@ -52,6 +51,9 @@
             "output/li21/",
             "output/zhu/"
         ];
+
+        // 사용할 인덱스 배열을 지정
+        const imageIndices = [1, 2, 10, 11]; // 1, 2, 10, 11번째 이미지만 사용
 
         // 배열을 무작위로 섞는 함수
         function shuffleArray(array) {
@@ -72,11 +74,8 @@
             return code;
         }
 
-        // 총 20개의 질문을 생성 (질문 순서와 이미지 순서 무작위)
-        let questionsOrder = Array.from({length: 20}, (_, i) => i + 1); // [1, 2, ..., 20]
-        questionsOrder = shuffleArray(questionsOrder); // 질문 순서 무작위
-
-        for (let q of questionsOrder) {
+        // 지정한 인덱스에 대해 질문 생성
+        for (let q of imageIndices) {
             let imageOrder = shuffleArray([0, 1, 2, 3, 4]); // 이미지 순서 무작위
             let questionDiv = document.createElement("div");
 
@@ -115,7 +114,7 @@
         // 선택된 이미지를 제출하는 함수
         function submitSelection() {
             let results = {};
-            for (let i = 1; i <= 20; i++) {
+            for (let i of imageIndices) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
                 results[`image${i}`] = selectedImage ? selectedImage.value : "No selection";
             }
@@ -145,7 +144,7 @@
         // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
         function checkSelections() {
             let allSelected = true;
-            for (let i = 1; i <= 20; i++) {
+            for (let i of imageIndices) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
                 if (!selectedImage) {
                     allSelected = false;
