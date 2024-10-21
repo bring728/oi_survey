@@ -61,6 +61,16 @@
             return array;
         }
 
+        // 랜덤 코드 생성 함수
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
         // 총 20개의 질문을 생성 (질문 순서와 이미지 순서 무작위)
         let questionsOrder = Array.from({length: 20}, (_, i) => i + 1); // [1, 2, ..., 20]
         questionsOrder = shuffleArray(questionsOrder); // 질문 순서 무작위
@@ -70,7 +80,6 @@
             let questionDiv = document.createElement("div");
 
             questionDiv.innerHTML = `
-                <h2>Question ${q}</h2>
                 <div class="image-container">
                     <div class="image-item">
                         <img src="${basePaths[imageOrder[0]]}example${q}.png" alt="Image ${q}-1">
@@ -104,29 +113,45 @@
 
         // 선택된 이미지를 제출하는 함수
         function submitSelection() {
-            let results = '';
+            let results = {};
             for (let i = 1; i <= 20; i++) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
-                if (selectedImage) {
-                    results += `Question ${i}: ${selectedImage.value}\n`;
-                } else {
-                    results += `Question ${i}: No selection\n`;
-                }
+                results[`image${i}`] = selectedImage ? selectedImage.value : "No selection";
             }
-            document.getElementById('result').innerText = results;
+
+            // 랜덤 코드 생성 및 사용자에게 표시
+            const randomCode = generateRandomCode();
+            alert(`Your random code is: ${randomCode}`);
+            
+            // 설문조사 결과와 랜덤 코드 전송
+            results['randomCode'] = randomCode; // 결과에 랜덤 코드 추가
+
+            // Google Apps Script로 데이터 전송
+            fetch("YOUR_WEB_APP_URL", { // 배포된 Google Apps Script URL로 변경
+                method: "POST",
+                body: JSON.stringify(results),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('result').innerText = "Survey submitted successfully!";
+            })
+            .catch(error => {
+                document.getElementById('result').innerText = "Submission failed. Please try again.";
+            });
         }
 
         // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
         function checkSelections() {
-            let isSelected = false;
+            let allSelected = true;
             for (let i = 1; i <= 20; i++) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
-                if (selectedImage) {
-                    isSelected = true;
-                    break; // 한 이미지라도 선택되면 바로 중단
+                if (!selectedImage) {
+                    allSelected = false;
+                    break;
                 }
             }
-            document.getElementById('submitBtn').disabled = !isSelected;
+            document.getElementById('submitBtn').disabled = !allSelected;
         }
     </script>
 
