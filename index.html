@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -150,6 +150,51 @@
                 }
             }
             document.getElementById('submitBtn').disabled = !allSelected;
+        }
+    </script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World Test</title>
+</head>
+<body>
+
+    <h1>Send "Hello World" to Google Sheets</h1>
+
+    <button type="button" onclick="sendHelloWorld()">Submit</button>
+
+    <p id="result"></p>
+
+    <script>
+        function sendHelloWorld() {
+            // 전송할 데이터
+            const data = {
+                message: "Hello World"
+            };
+
+            // Google Apps Script의 웹 앱 URL로 데이터 전송
+            fetch("https://script.google.com/macros/s/AKfycbypH55xTxn1e_1lwnoO0qnCSizHzdqmfoQhDUWoFc9LbKC_nFHsRTFL9BwJsRZ_f0xo/exec", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('result').innerText = "Submission successful!";
+            })
+            .catch(error => {
+                document.getElementById('result').innerText = "Submission failed!";
+                console.error('Error:', error);
+            });
         }
     </script>
 
