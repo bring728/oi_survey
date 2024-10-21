@@ -17,9 +17,10 @@
         .image-item {
             text-align: center;
         }
+        /* 이미지 크기를 크게 설정 */
         .image-item img {
-            width: 200px;
-            height: auto;
+            width: 400px; /* 이미지 너비를 400px로 설정 */
+            height: auto; /* 높이를 자동으로 설정하여 비율 유지 */
         }
         #submitBtn {
             margin-top: 20px;
@@ -127,7 +128,7 @@
             results['randomCode'] = randomCode; // 결과에 랜덤 코드 추가
 
             // Google Apps Script로 데이터 전송
-            fetch("YOUR_WEB_APP_URL", { // 배포된 Google Apps Script URL로 변경
+            fetch("https://script.google.com/macros/s/AKfycbzNrYTx3O0sVTu1pf_9DhUaXAJoa7OEHMIJYlogOEctNr6j5FSKwKpjTeDRtQhj4_yC/exec", { // 배포된 Google Apps Script URL로 변경
                 method: "POST",
                 body: JSON.stringify(results),
                 headers: { "Content-Type": "application/json" }
