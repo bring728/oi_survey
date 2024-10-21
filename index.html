@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Selection Survey</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .image-item {
+            text-align: center;
+        }
+        .image-item img {
+            width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Image Selection Survey</h1>
+
+    <form id="surveyForm">
+        <!-- 20개의 질문을 자동 생성 -->
+        <div id="questions"></div>
+
+        <br>
+        <button type="button" onclick="submitSelection()">Submit</button>
+    </form>
+
+    <p id="result"></p>
+
+    <script>
+        // 이미지 경로 템플릿
+        const basePaths = [
+            "C:/Users/junyong/Desktop/object insertion/Ground-truth/",
+            "C:/Users/junyong/Desktop/object insertion/Garon_CVPR19/",
+            "C:/Users/junyong/Desktop/object insertion/IRBDM/",
+            "C:/Users/junyong/Desktop/object insertion/li21/",
+            "C:/Users/junyong/Desktop/object insertion/zhu/"
+        ];
+
+        // 총 20개의 질문을 생성
+        for (let i = 1; i <= 20; i++) {
+            let questionDiv = document.createElement("div");
+            questionDiv.innerHTML = `
+                <h2>Question ${i}</h2>
+                <div class="image-container">
+                    <div class="image-item">
+                        <img src="${basePaths[0]}example${i}.png" alt="Image ${i}-1">
+                        <br>
+                        <input type="radio" name="image${i}" value="Ground-truth Example ${i}"> Ground-truth
+                    </div>
+                    <div class="image-item">
+                        <img src="${basePaths[1]}example${i}.png" alt="Image ${i}-2">
+                        <br>
+                        <input type="radio" name="image${i}" value="Garon_CVPR19 Example ${i}"> Garon_CVPR19
+                    </div>
+                    <div class="image-item">
+                        <img src="${basePaths[2]}example${i}.png" alt="Image ${i}-3">
+                        <br>
+                        <input type="radio" name="image${i}" value="IRBDM Example ${i}"> IRBDM
+                    </div>
+                    <div class="image-item">
+                        <img src="${basePaths[3]}example${i}.png" alt="Image ${i}-4">
+                        <br>
+                        <input type="radio" name="image${i}" value="li21 Example ${i}"> li21
+                    </div>
+                    <div class="image-item">
+                        <img src="${basePaths[4]}example${i}.png" alt="Image ${i}-5">
+                        <br>
+                        <input type="radio" name="image${i}" value="zhu Example ${i}"> zhu
+                    </div>
+                </div>
+            `;
+            document.getElementById("questions").appendChild(questionDiv);
+        }
+
+        // 선택된 이미지를 제출하는 함수
+        function submitSelection() {
+            let results = '';
+            for (let i = 1; i <= 20; i++) {
+                const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
+                if (selectedImage) {
+                    results += `Question ${i}: ${selectedImage.value}\n`;
+                } else {
+                    results += `Question ${i}: No selection\n`;
+                }
+            }
+            document.getElementById('result').innerText = results;
+        }
+    </script>
+
+</body>
+</html>
