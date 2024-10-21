@@ -21,6 +21,11 @@
             width: 200px;
             height: auto;
         }
+        #submitBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -32,7 +37,7 @@
         <div id="questions"></div>
 
         <br>
-        <button type="button" onclick="submitSelection()">Submit</button>
+        <button type="button" id="submitBtn" onclick="submitSelection()" disabled>Submit</button>
     </form>
 
     <p id="result"></p>
@@ -47,36 +52,50 @@
             "output/zhu/"
         ];
 
-        // 총 20개의 질문을 생성
-        for (let i = 1; i <= 20; i++) {
+        // 배열을 무작위로 섞는 함수
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 총 20개의 질문을 생성 (질문 순서와 이미지 순서 무작위)
+        let questionsOrder = Array.from({length: 20}, (_, i) => i + 1); // [1, 2, ..., 20]
+        questionsOrder = shuffleArray(questionsOrder); // 질문 순서 무작위
+
+        for (let q of questionsOrder) {
+            let imageOrder = shuffleArray([0, 1, 2, 3, 4]); // 이미지 순서 무작위
             let questionDiv = document.createElement("div");
+
             questionDiv.innerHTML = `
-                <h2>Question ${i}</h2>
+                <h2>Question ${q}</h2>
                 <div class="image-container">
                     <div class="image-item">
-                        <img src="${basePaths[0]}example${i}.png" alt="Image ${i}-1">
+                        <img src="${basePaths[imageOrder[0]]}example${q}.png" alt="Image ${q}-1">
                         <br>
-                        <input type="radio" name="image${i}" value="Ground-truth Example ${i}"> Ground-truth
+                        <input type="radio" name="image${q}" value="Image 1" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[1]}example${i}.png" alt="Image ${i}-2">
+                        <img src="${basePaths[imageOrder[1]]}example${q}.png" alt="Image ${q}-2">
                         <br>
-                        <input type="radio" name="image${i}" value="Garon_CVPR19 Example ${i}"> Garon_CVPR19
+                        <input type="radio" name="image${q}" value="Image 2" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[2]}example${i}.png" alt="Image ${i}-3">
+                        <img src="${basePaths[imageOrder[2]]}example${q}.png" alt="Image ${q}-3">
                         <br>
-                        <input type="radio" name="image${i}" value="IRBDM Example ${i}"> IRBDM
+                        <input type="radio" name="image${q}" value="Image 3" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[3]}example${i}.png" alt="Image ${i}-4">
+                        <img src="${basePaths[imageOrder[3]]}example${q}.png" alt="Image ${q}-4">
                         <br>
-                        <input type="radio" name="image${i}" value="li21 Example ${i}"> li21
+                        <input type="radio" name="image${q}" value="Image 4" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[4]}example${i}.png" alt="Image ${i}-5">
+                        <img src="${basePaths[imageOrder[4]]}example${q}.png" alt="Image ${q}-5">
                         <br>
-                        <input type="radio" name="image${i}" value="zhu Example ${i}"> zhu
+                        <input type="radio" name="image${q}" value="Image 5" onclick="checkSelections()">
                     </div>
                 </div>
             `;
@@ -95,6 +114,19 @@
                 }
             }
             document.getElementById('result').innerText = results;
+        }
+
+        // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
+        function checkSelections() {
+            let isSelected = false;
+            for (let i = 1; i <= 20; i++) {
+                const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
+                if (selectedImage) {
+                    isSelected = true;
+                    break; // 한 이미지라도 선택되면 바로 중단
+                }
+            }
+            document.getElementById('submitBtn').disabled = !isSelected;
         }
     </script>
 
