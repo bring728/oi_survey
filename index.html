@@ -174,26 +174,21 @@
 
     <script>
         function sendHelloWorld() {
-            // 전송할 데이터
-            const data = {
-                message: "Hello World"
-            };
-
-            // Google Apps Script의 웹 앱 URL로 데이터 전송
-            fetch("https://script.google.com/macros/s/AKfycby_O3PcTG-z3NV6eHu_ztd6ngXVPCnM4UbmQ2R7gubmAWR-DhyuViLpyqstDb1jz1KJ/exec", {
+            console.log("Sending data...");
+            fetch("https://script.google.com/macros/s/AKfycbzwvo2FwSID_tfBLqf2GDHkVmglO-psg7uAONStuQbD9ZBEQ058EdokyHqzcUVESmCC/exec", {
                 method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                mode: 'no-cors',  // Bypass CORS
+                body: JSON.stringify({ message: "Hello World" }),
+                headers: { "Content-Type": "application/json" }
             })
             .then(response => response.text())
             .then(result => {
+                console.log("Submission successful:", result);
                 document.getElementById('result').innerText = "Submission successful!";
             })
             .catch(error => {
+                console.log("Submission failed:", error);
                 document.getElementById('result').innerText = "Submission failed!";
-                console.error('Error:', error);
             });
         }
     </script>
