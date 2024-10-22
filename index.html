@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -40,19 +40,19 @@
     <p id="result"></p>
 
     <script>
-        // 이미지 경로 템플릿
+        // 이미지 경로 템플릿 및 method 이름
         const basePaths = [
-            "output/Ground-truth/",
-            "output/Garon_CVPR19/",
-            "output/IRBDM/",
-            "output/li21/",
-            "output/zhu/"
+            { path: "output/Ground-truth/", method: "Ground-truth" },
+            { path: "output/Garon_CVPR19/", method: "Garon_CVPR19" },
+            { path: "output/IRBDM/", method: "IRBDM" },
+            { path: "output/li21/", method: "li21" },
+            { path: "output/zhu/", method: "zhu" }
         ];
 
-        // 사용할 인덱스 배열을 지정
+        // 사용할 인덱스 배열을 지정 (질문 순서는 고정)
         const imageIndices = [1, 2, 10, 11]; // 1, 2, 10, 11번째 이미지만 사용
 
-        // 배열을 무작위로 섞는 함수
+        // 배열을 무작위로 섞는 함수 (이미지 순서만 변경)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -61,17 +61,7 @@
             return array;
         }
 
-        // 랜덤 코드 생성 함수
-        function generateRandomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        // 지정한 인덱스에 대해 질문 생성
+        // 지정한 인덱스에 대해 질문 생성 (질문 순서는 그대로, 이미지 순서만 무작위)
         for (let q of imageIndices) {
             let imageOrder = shuffleArray([0, 1, 2, 3, 4]); // 이미지 순서 무작위
             let questionDiv = document.createElement("div");
@@ -79,65 +69,72 @@
             questionDiv.innerHTML = `
                 <div class="image-container">
                     <div class="image-item">
-                        <img src="${basePaths[imageOrder[0]]}example${q}.png" alt="Image ${q}-1">
+                        <img src="${basePaths[imageOrder[0]].path}example${q}.png" alt="Image ${q}-1">
                         <br>
-                        <input type="radio" name="image${q}" value="Image 1" onclick="checkSelections()">
+                        <input type="radio" name="image${q}" value="${basePaths[imageOrder[0]].method}" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[imageOrder[1]]}example${q}.png" alt="Image ${q}-2">
+                        <img src="${basePaths[imageOrder[1]].path}example${q}.png" alt="Image ${q}-2">
                         <br>
-                        <input type="radio" name="image${q}" value="Image 2" onclick="checkSelections()">
+                        <input type="radio" name="image${q}" value="${basePaths[imageOrder[1]].method}" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[imageOrder[2]]}example${q}.png" alt="Image ${q}-3">
+                        <img src="${basePaths[imageOrder[2]].path}example${q}.png" alt="Image ${q}-3">
                         <br>
-                        <input type="radio" name="image${q}" value="Image 3" onclick="checkSelections()">
+                        <input type="radio" name="image${q}" value="${basePaths[imageOrder[2]].method}" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[imageOrder[3]]}example${q}.png" alt="Image ${q}-4">
+                        <img src="${basePaths[imageOrder[3]].path}example${q}.png" alt="Image ${q}-4">
                         <br>
-                        <input type="radio" name="image${q}" value="Image 4" onclick="checkSelections()">
+                        <input type="radio" name="image${q}" value="${basePaths[imageOrder[3]].method}" onclick="checkSelections()">
                     </div>
                     <div class="image-item">
-                        <img src="${basePaths[imageOrder[4]]}example${q}.png" alt="Image ${q}-5">
+                        <img src="${basePaths[imageOrder[4]].path}example${q}.png" alt="Image ${q}-5">
                         <br>
-                        <input type="radio" name="image${q}" value="Image 5" onclick="checkSelections()">
+                        <input type="radio" name="image${q}" value="${basePaths[imageOrder[4]].method}" onclick="checkSelections()">
                     </div>
                 </div>
             `;
             document.getElementById("questions").appendChild(questionDiv);
         }
 
-        // 선택된 이미지를 제출하는 함수
+        // 선택된 이미지를 제출하는 함수 (선택된 method 통계 포함)
         function submitSelection() {
             let results = {};
             for (let i of imageIndices) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
                 results[`image${i}`] = selectedImage ? selectedImage.value : "No selection";
             }
-
+        
             // 랜덤 코드 생성 및 사용자에게 표시
             const randomCode = generateRandomCode();
-            alert(`Your random code is: ${randomCode}`);
-            
+            alert(`Your random code is: "${randomCode}". Please submit this code on MTurk.`);
+        
             // 설문조사 결과와 랜덤 코드 전송
             results['randomCode'] = randomCode; // 결과에 랜덤 코드 추가
-
+        
             // Google Apps Script로 데이터 전송
-            fetch("https://script.google.com/macros/s/AKfycbyuU_wOH0q9xg8BckV3f8kYTbHTxYemMGkihIbjEFjUqed3mFsDwcwQcJE7_w9Fs01J/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbxf4N6Iu1JuooyeQjDDXblmTmSjbH6LtY9QrKdTJ_-m9oNhJjnujFNlMssMIu-HUUHM/exec", {
                 method: "POST",
+                mode: 'no-cors',  // Bypass CORS
                 body: JSON.stringify(results),
                 headers: { "Content-Type": "application/json" }
             })
-
             .then(response => response.text())
             .then(result => {
                 document.getElementById('result').innerText = "Survey submitted successfully!";
+                // 페이지를 변경하거나 창을 닫는 부분
+                window.close(); // 창을 닫음
+                // 또는 window.location.href = "http://example.com"; // 특정 URL로 이동
             })
             .catch(error => {
                 document.getElementById('result').innerText = "Submission failed. Please try again.";
             });
+        
+            // Submit 버튼 비활성화
+            document.getElementById('submitBtn').disabled = true;
         }
+        
 
         // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
         function checkSelections() {
@@ -151,45 +148,15 @@
             }
             document.getElementById('submitBtn').disabled = !allSelected;
         }
-    </script>
 
-</body>
-</html> -->
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World Test</title>
-</head>
-<body>
-
-    <h1>Send "Hello World" to Google Sheets</h1>
-
-    <button type="button" onclick="sendHelloWorld()">Submit</button>
-
-    <p id="result"></p>
-
-    <script>
-        function sendHelloWorld() {
-            console.log("Sending data...");
-            fetch("https://script.google.com/macros/s/AKfycbzwvo2FwSID_tfBLqf2GDHkVmglO-psg7uAONStuQbD9ZBEQ058EdokyHqzcUVESmCC/exec", {
-                method: "POST",
-                mode: 'no-cors',  // Bypass CORS
-                body: JSON.stringify({ message: "Hello World" }),
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log("Submission successful:", result);
-                document.getElementById('result').innerText = "Submission successful!";
-            })
-            .catch(error => {
-                console.log("Submission failed:", error);
-                document.getElementById('result').innerText = "Submission failed!";
-            });
+        // 랜덤 코드 생성 함수
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
         }
     </script>
 
