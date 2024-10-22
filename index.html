@@ -98,7 +98,6 @@
             document.getElementById("questions").appendChild(questionDiv);
         }
 
-        // 선택된 이미지를 제출하는 함수 (선택된 method 통계 포함)
         function submitSelection() {
             let results = {};
             for (let i of imageIndices) {
@@ -106,34 +105,32 @@
                 results[`image${i}`] = selectedImage ? selectedImage.value : "No selection";
             }
         
-            // 랜덤 코드 생성 및 사용자에게 표시
             const randomCode = generateRandomCode();
-            alert(`Your random code is: "${randomCode}". Please submit this code on MTurk.`);
+            localStorage.setItem('randomCode', randomCode);
         
-            // 설문조사 결과와 랜덤 코드 전송
-            results['randomCode'] = randomCode; // 결과에 랜덤 코드 추가
-        
-            // Google Apps Script로 데이터 전송
+            results['randomCode'] = randomCode;
             fetch("https://script.google.com/macros/s/AKfycbxf4N6Iu1JuooyeQjDDXblmTmSjbH6LtY9QrKdTJ_-m9oNhJjnujFNlMssMIu-HUUHM/exec", {
                 method: "POST",
-                mode: 'no-cors',  // Bypass CORS
+                mode: 'no-cors', 
                 body: JSON.stringify(results),
                 headers: { "Content-Type": "application/json" }
             })
             .then(response => response.text())
             .then(result => {
-                document.getElementById('result').innerText = "Survey submitted successfully!";
-                // 페이지를 변경하거나 창을 닫는 부분
-                window.close(); // 창을 닫음
-                // 또는 window.location.href = "http://example.com"; // 특정 URL로 이동
+                document.getElementById('submitBtn').disabled = true;
+                history.replaceState(null, null, window.location.href);
+                window.location.href = "thankyou.html";
             })
             .catch(error => {
                 document.getElementById('result').innerText = "Submission failed. Please try again.";
+                document.getElementById('submitBtn').disabled = false;
+                alert("Submission failed! Please try again.");
             });
         
-            // Submit 버튼 비활성화
             document.getElementById('submitBtn').disabled = true;
         }
+        
+        
         
 
         // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
