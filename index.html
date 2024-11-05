@@ -10,15 +10,16 @@
             text-align: center;
         }
         .image-container {
-            display: flex;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
             margin-top: 20px;
         }
         .image-item {
             text-align: center;
         }
         .image-item img {
-            width: 400px; /* 이미지 크기 설정 */
+            width: 100%; /* 항상 4개 이미지가 한 줄에 표시 */
             height: auto; /* 비율 유지 */
         }
         #submitBtn {
@@ -40,7 +41,6 @@
     <p id="result"></p>
 
     <script>
-        // 이미지 경로 템플릿 및 method 이름
         const basePaths = [
             { path: "output/Ground-truth/", method: "Ground-truth" },
             { path: "output/SDM/", method: "SDM" },
@@ -48,9 +48,8 @@
             { path: "output/zhu/", method: "zhu" }
         ];
 
-        const imageIndices = [1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 20]; 
+        const imageIndices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]; 
 
-        // 배열을 무작위로 섞는 함수
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -60,10 +59,11 @@
         }
 
         for (let q of imageIndices) {
-            let imageOrder = shuffleArray([...Array(basePaths.length).keys()]); 
+            let imageOrder = shuffleArray([...Array(basePaths.length).keys()]);
             let questionDiv = document.createElement("div");
-
+        
             questionDiv.innerHTML = `
+                <h3>Question ${questionNumber}: Among the four images, please choose the image that has a white rabbit inserted naturally into the surrounding lighting.</h3>
                 <div class="image-container">
                     ${imageOrder.map(i => `
                         <div class="image-item">
@@ -75,19 +75,23 @@
                 </div>
             `;
             document.getElementById("questions").appendChild(questionDiv);
+            questionNumber++; // 문제 번호 증가
         }
-
+        
         function submitSelection() {
             let results = {};
             for (let i of imageIndices) {
                 const selectedImage = document.querySelector(`input[name="image${i}"]:checked`);
                 results[`image${i}`] = selectedImage ? selectedImage.value : "No selection";
             }
-        
+
             const randomCode = generateRandomCode();
             localStorage.setItem('randomCode', randomCode);
-        
+
             results['randomCode'] = randomCode;
+
+            localStorage.setItem('surveySubmitted', 'true');
+
             fetch("https://script.google.com/macros/s/AKfycbxf4N6Iu1JuooyeQjDDXblmTmSjbH6LtY9QrKdTJ_-m9oNhJjnujFNlMssMIu-HUUHM/exec", {
                 method: "POST",
                 mode: 'no-cors', 
@@ -97,7 +101,6 @@
             .then(response => response.text())
             .then(result => {
                 document.getElementById('submitBtn').disabled = true;
-                history.replaceState(null, null, window.location.href);
                 window.location.href = "thankyou.html";
             })
             .catch(error => {
@@ -105,11 +108,10 @@
                 document.getElementById('submitBtn').disabled = false;
                 alert("Submission failed! Please try again.");
             });
-        
+
             document.getElementById('submitBtn').disabled = true;
         }
 
-        // 선택된 이미지가 있는지 확인하여 Submit 버튼 활성화
         function checkSelections() {
             let allSelected = true;
             for (let i of imageIndices) {
@@ -122,7 +124,6 @@
             document.getElementById('submitBtn').disabled = !allSelected;
         }
 
-        // 랜덤 코드 생성 함수
         function generateRandomCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let code = '';
