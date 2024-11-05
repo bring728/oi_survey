@@ -58,6 +58,8 @@
             return array;
         }
 
+        let questionNumber = 1;
+
         for (let q of imageIndices) {
             let imageOrder = shuffleArray([...Array(basePaths.length).keys()]);
             let questionDiv = document.createElement("div");
@@ -77,7 +79,7 @@
             document.getElementById("questions").appendChild(questionDiv);
             questionNumber++; // 문제 번호 증가
         }
-        
+
         function submitSelection() {
             let results = {};
             for (let i of imageIndices) {
